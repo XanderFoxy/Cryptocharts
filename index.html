@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>4er TradingView Übersicht — ETH / NEAR / LINK / BTC</title>
+
+  <!-- TradingView widget script -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+  <style>
+    :root{
+      --gap: 12px;
+      --title-h: 36px;
+      --bg: #0f1720;
+      --panel-bg: #0b1220;
+      --title-bg: rgba(255,255,255,0.05);
+      --accent: #0ea5a5;
+      --radius: 8px;
+      --shadow: 0 6px 18px rgba(2,6,23,0.6);
+      --text: #e6eef8;
+      --muted: #9fb0c8;
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#07121a 0%, #061018 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    header{
+      padding:16px 20px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:var(--muted);
+      font-weight:600;
+      letter-spacing:0.2px;
+    }
+    header h1{ margin:0; font-size:16px; color:var(--text); font-weight:700; }
+
+    /* grid container */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: calc((100vh - 84px - var(--gap)) / 2); /* header area - gap */
+      gap: var(--gap);
+      padding: 12px;
+      box-sizing: border-box;
+      height: calc(100vh - 60px);
+      align-items: stretch;
+    }
+
+    /* panel */
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+      display:flex;
+      flex-direction:column;
+      box-shadow: var(--shadow);
+      transition: transform 260ms ease, width 260ms ease, height 260ms ease, left 260ms ease, top 260ms ease;
+      min-height: 160px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    .title {
+      height: var(--title-h);
+      line-height: var(--title-h);
+      display:flex;
+      align-items:center;
+      padding: 0 12px;
+      cursor: pointer;
+      user-select: none;
+      background: linear-gradient(180deg,var(--title-bg), rgba(255,255,255,0.01));
+      gap:10px;
+      font-size:14px;
+      color:var(--text);
+      border-bottom:1px solid rgba(255,255,255,0.02);
+    }
+    .title .dot {
+      width:10px;height:10px;border-radius:50%;
+      background:var(--accent); box-shadow:0 0 8px rgba(14,165,165,0.18);
+    }
+    .title .label { font-weight:600; flex:1; }
+
+    .title .hint { color:var(--muted); font-size:12px; margin-left:8px; }
+
+    .content {
+      flex:1;
+      min-height:0; /* important for children to size inside flex */
+      position:relative;
+    }
+
+    /* floating state */
+    .floating {
+      position: fixed !important;
+      width: min(92vw, 1200px) !important;
+      height: min(86vh, 800px) !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      z-index: 9999 !important;
+      border-radius: 12px !important;
+      box-shadow: 0 18px 50px rgba(2,6,23,0.8);
+      transition: transform 180ms ease, box-shadow 180ms ease, width 180ms ease, height 180ms ease;
+      outline: 2px solid rgba(14,165,165,0.06);
+    }
+
+    /* when any panel is floating, fade backgrounds slightly to emphasize focus */
+    .dimmed {
+      filter: blur(0.2px) brightness(0.94);
+      transition: filter 160ms ease;
+    }
+
+    /* small helper: icon buttons inside title (not required but nice) */
+    .title .actions {
+      display:flex; gap:6px; align-items:center;
+    }
+    .btn {
+      width:30px; height:26px; display:inline-flex; align-items:center; justify-content:center;
+      border-radius:6px; background:transparent; border: none; color:var(--muted);
+      cursor:pointer; font-size:13px;
+    }
+    .btn:hover { color:var(--text); background: rgba(255,255,255,0.02); }
+
+    /* responsive: single column on narrow screens */
+    @media (max-width:900px){
+      .grid { grid-template-columns: 1fr; grid-auto-rows: calc((100vh - 84px - var(--gap)) / 4); }
+    }
+
+    /* small note at bottom */
+    footer {
+      padding:8px 16px 20px;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>4-Panel TradingView Übersicht</h1>
+    <div style="flex:1"></div>
+    <div style="color:var(--muted);font-size:13px">Klicke die Titel-Leiste, um das Panel zu vergrössern / wiederherzustellen</div>
+  </header>
+
+  <main class="grid" id="grid">
+    <!-- Panel: Ethereum -->
+    <div class="panel" data-symbol="BINANCE:ETHUSDT" id="panel-eth">
+      <div class="title" data-panel="panel-eth" title="Klicken: vergrößern / wiederherstellen">
+        <div class="dot" aria-hidden></div>
+        <div class="label">Ethereum — ETH/USDT</div>
+        <div class="actions">
+          <button class="btn" aria-label="Vergrößern">⤢</button>
+        </div>
+      </div>
+      <div class="content" id="tv-eth"></div>
+    </div>
+
+    <!-- Panel: Near -->
+    <div class="panel" data-symbol="BINANCE:NEARUSDT" id="panel-near">
+      <div class="title" data-panel="panel-near" title="Klicken: vergrößern / wiederherstellen">
+        <div class="dot" aria-hidden></div>
+        <div class="label">NEAR — NEAR/USDT</div>
+        <div class="actions">
+          <button class="btn" aria-label="Vergrößern">⤢</button>
+        </div>
+      </div>
+      <div class="content" id="tv-near"></div>
+    </div>
+
+    <!-- Panel: Chainlink (LINK) -->
+    <div class="panel" data-symbol="BINANCE:LINKUSDT" id="panel-link">
+      <div class="title" data-panel="panel-link" title="Klicken: vergrößern / wiederherstellen">
+        <div class="dot" aria-hidden></div>
+        <div class="label">Chainlink — LINK/USDT</div>
+        <div class="actions">
+          <button class="btn" aria-label="Vergrößern">⤢</button>
+        </div>
+      </div>
+      <div class="content" id="tv-link"></div>
+    </div>
+
+    <!-- Panel: Bitcoin -->
+    <div class="panel" data-symbol="BINANCE:BTCUSDT" id="panel-btc">
+      <div class="title" data-panel="panel-btc" title="Klicken: vergrößern / wiederherstellen">
+        <div class="dot" aria-hidden></div>
+        <div class="label">Bitcoin — BTC/USDT</div>
+        <div class="actions">
+          <button class="btn" aria-label="Vergrößern">⤢</button>
+        </div>
+      </div>
+      <div class="content" id="tv-btc"></div>
+    </div>
+  </main>
+
+  <footer>
+    Deployment: Einfach `index.html` in dein GitHub-Repo pushen (root). GitHub Pages zeigt die Seite dann.
+  </footer>
+
+  <script>
+    /***** Helper: instantiate TradingView advanced charts for each container *****/
+    const panels = [
+      { id: 'tv-eth', symbol: 'BINANCE:ETHUSDT', title: 'Ethereum (ETH/USDT)' },
+      { id: 'tv-near', symbol: 'BINANCE:NEARUSDT', title: 'NEAR (NEAR/USDT)' },
+      { id: 'tv-link', symbol: 'BINANCE:LINKUSDT', title: 'Chainlink (LINK/USDT)' },
+      { id: 'tv-btc', symbol: 'BINANCE:BTCUSDT', title: 'Bitcoin (BTC/USDT)' },
+    ];
+
+    function createTV(containerId, symbol) {
+      if (!window.TradingView) {
+        // wenn tv.js noch nicht geladen ist (sehr selten), warte kurz
+        console.warn('TradingView library nicht geladen — versuche in 300ms erneut.');
+        setTimeout(()=>createTV(containerId,symbol),300);
+        return;
+      }
+      new TradingView.widget({
+        "container_id": containerId,
+        "autosize": true,
+        "symbol": symbol,
+        "interval": "60",
+        "timezone": "Europe/Berlin",
+        "theme": "dark",
+        "style": "1",
+        "locale": "de",
+        "toolbar_bg": "#0b1220",
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "studies": ["MACD@tv-basicstudies","RSI@tv-basicstudies"],
+        "withdateranges": true,
+        "details": true,
+        "hotlist": false,
+        "news": ["headlines"]
+      });
+    }
+
+    // create all widgets
+    panels.forEach(p => createTV(p.id, p.symbol));
+
+    /***** Floating / restore interaction logic *****/
+    const gridEl = document.getElementById('grid');
+    const panelEls = Array.from(document.querySelectorAll('.panel'));
+
+    // If a panel is floating, other panels get 'dimmed' (slight visual de-emphasis)
+    function updateDimmed() {
+      const anyFloating = panelEls.some(p => p.classList.contains('floating'));
+      panelEls.forEach(p => {
+        if (!p.classList.contains('floating')) {
+          if (anyFloating) p.classList.add('dimmed'); else p.classList.remove('dimmed');
+        } else {
+          p.classList.remove('dimmed');
+        }
+      });
+    }
+
+    // toggle floating when clicking title
+    document.querySelectorAll('.title').forEach(title => {
+      title.addEventListener('click', (ev) => {
+        const panelId = title.getAttribute('data-panel');
+        const panel = document.getElementById(panelId);
+        const isFloating = panel.classList.contains('floating');
+
+        if (!isFloating) {
+          // make floating: add class and bring to front
+          panel.classList.add('floating');
+          // set a data attr to mark last position, in case we want to restore scroll etc. (not strictly necessary)
+          panel.dataset.previously = 'grid';
+          // optionally focus the chart container for keyboard / accessibility
+          const tv = panel.querySelector('.content');
+          if (tv) tv.focus && tv.focus();
+        } else {
+          // restore to grid: remove floating
+          panel.classList.remove('floating');
+        }
+        updateDimmed();
+      });
+    });
+
+    /***** Optional: allow dragging when floating (desktop) *****/
+    // Basic drag implementation: only active while panel has class 'floating'.
+    panelEls.forEach(panel => {
+      const title = panel.querySelector('.title');
+
+      let isDragging = false;
+      let startX = 0, startY = 0, startLeft = 0, startTop = 0;
+
+      title.addEventListener('mousedown', (e) => {
+        if (!panel.classList.contains('floating')) return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        // compute current left/top numeric values (from transform center we will compute offsets)
+        const rect = panel.getBoundingClientRect();
+        startLeft = rect.left;
+        startTop = rect.top;
+        panel.style.transition = 'none'; // disable transitions during drag
+        e.preventDefault();
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        // move panel by setting left/top and transform to none
+        panel.style.left = (startLeft + dx) + 'px';
+        panel.style.top = (startTop + dy) + 'px';
+        panel.style.transform = 'none';
+        panel.style.right = 'auto';
+        panel.style.bottom = 'auto';
+      });
+
+      window.addEventListener('mouseup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        // re-enable transitions
+        panel.style.transition = '';
+      });
+
+      // Touch support
+      title.addEventListener('touchstart', (e) => {
+        if (!panel.classList.contains('floating')) return;
+        const touch = e.touches[0];
+        isDragging = true;
+        startX = touch.clientX;
+        startY = touch.clientY;
+        const rect = panel.getBoundingClientRect();
+        startLeft = rect.left;
+        startTop = rect.top;
+      });
+      window.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+        panel.style.left = (startLeft + dx) + 'px';
+        panel.style.top = (startTop + dy) + 'px';
+        panel.style.transform = 'none';
+      });
+      window.addEventListener('touchend', ()=> isDragging = false);
+    });
+
+    // Accessibility: allow ESC to close any floating panel
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        let anything = false;
+        panelEls.forEach(p => {
+          if (p.classList.contains('floating')) {
+            p.classList.remove('floating');
+            anything = true;
+            // reset left/top styles to allow CSS centering again
+            p.style.left = '';
+            p.style.top = '';
+            p.style.transform = '';
+          }
+        });
+        if (anything) updateDimmed();
+      }
+    });
+
+    // On resize, if panels are floating, keep them roughly centered / not off-screen
+    window.addEventListener('resize', () => {
+      panelEls.forEach(p => {
+        if (p.classList.contains('floating')) {
+          // ensure not off-screen: clamp left/top
+          const rect = p.getBoundingClientRect();
+          let left = rect.left;
+          let top = rect.top;
+          const maxLeft = window.innerWidth - rect.width - 10;
+          const maxTop = window.innerHeight - rect.height - 10;
+          if (left < 8) p.style.left = '8px';
+          if (top < 8) p.style.top = '8px';
+          if (left > maxLeft) p.style.left = maxLeft + 'px';
+          if (top > maxTop) p.style.top = maxTop + 'px';
+        }
+      });
+    });
+
+    // initial dim state
+    updateDimmed();
+  </script>
+</body>
+</html>
