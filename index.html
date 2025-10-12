@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView 4-Chart Dashboard</title>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-wrap: wrap;
+            height: 100vh;
+            margin: 0;
+            padding: 5px;
+            box-sizing: border-box;
+            background-color: #1a1a2e; /* Dunkler Hintergrund */
+            font-family: Arial, sans-serif;
+        }
+
+        .chart-container {
+            width: calc(50% - 10px); /* 2 Spalten, 10px für margin/padding */
+            height: calc(50% - 10px); /* 2 Reihen */
+            margin: 5px;
+            box-sizing: border-box;
+            border: 1px solid #333;
+            background-color: #2a2a4a;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            position: relative; /* Wichtig für die Positionierung im Raster */
+            overflow: hidden;
+        }
+
+        .chart-header {
+            padding: 8px;
+            background-color: #3b3b6b;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            user-select: none;
+        }
+
+        .chart-area {
+            flex-grow: 1;
+            /* Der Container für das Chart-Canvas */
+        }
+
+        /* Stil für das schwebende (Popped-out) Fenster */
+        .popped-out {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90vw !important; /* Fast volle Breite */
+            height: 90vh !important; /* Fast volle Höhe */
+            z-index: 1000; /* Über allem anderen */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="chart-container" id="chart-eth">
+        <div class="chart-header">Ethereum (ETHUSDT)</div>
+        <div class="chart-area" id="area-eth"></div>
+    </div>
+
+    <div class="chart-container" id="chart-near">
+        <div class="chart-header">Near Protocol (NEARUSDT)</div>
+        <div class="chart-area" id="area-near"></div>
+    </div>
+
+    <div class="chart-container" id="chart-link">
+        <div class="chart-header">Chainlink (LINKUSDT)</div>
+        <div class="chart-area" id="area-link"></div>
+    </div>
+
+    <div class="chart-container" id="chart-btc">
+        <div class="chart-header">Bitcoin (BTCUSDT)</div>
+        <div class="chart-area" id="area-btc"></div>
+    </div>
+
+    <script>
+        const chartData = [
+            { id: 'eth', symbol: 'ETHUSDT', name: 'Ethereum' },
+            { id: 'near', symbol: 'NEARUSDT', name: 'Near Protocol' },
+            { id: 'link', symbol: 'LINKUSDT', name: 'Chainlink' },
+            { id: 'btc', symbol: 'BTCUSDT', name: 'Bitcoin' }
+        ];
+
+        const charts = {};
+        const containerElements = {};
+
+        // 1. Initialisierung und Daten-Dummy
+        chartData.forEach(item => {
+            const container = document.getElementById(`chart-${item.id}`);
+            const chartArea = document.getElementById(`area-${item.id}`);
+            containerElements[item.id] = container;
+
+            // Chart-Erstellung
+            const chart = LightweightCharts.createChart(chartArea, {
+                width: chartArea.clientWidth,
+                height: chartArea.clientHeight,
+                layout: {
+                    backgroundColor: '#2a2a4a',
+                    textColor: 'rgba(255, 255, 255, 0.9)',
+                },
+                grid: {
+                    vertLines: { color: '#333' },
+                    horzLines: { color: '#333' },
+                },
+                timeScale: {
+                    timeVisible: true,
+                    secondsVisible: false,
+                },
+            });
+
+            // Eine Candlestick-Serie hinzufügen
+            const candleSeries = chart.addCandlestickSeries({
+                upColor: '#4bffb5', downColor: '#ff4976', borderVisible: false,
+                wickUpColor: '#4bffb5', wickDownColor: '#ff4976',
+            });
+            
+            // HINWEIS: Für echte Echtzeitdaten müssten Sie eine API (z.B. von Binance oder Kraken) verwenden, um die Daten abzurufen.
+            // Die Lightweight Charts Library bietet nur das Frontend. Hier verwenden wir eine Dummy-Datenstruktur.
+            const dummyData = generateDummyData(100, item.symbol);
+            candleSeries.setData(dummyData);
+
+            charts[item.id] = chart;
+        });
+
+        // 2. Responsive und Floating-Logik
+        
+        // Funktion zur Größenanpassung des Charts an seinen Container
+        function resizeChart(chart, container) {
+            chart.applyOptions({
+                width: container.clientWidth,
+                height: container.clientHeight - container.querySelector('.chart-header').offsetHeight
+            });
+        }
+
+        // Größenanpassung beim Laden und Ändern der Fenstergröße
+        window.addEventListener('resize', () => {
+            Object.values(charts).forEach((chart, index) => {
+                resizeChart(chart, containerElements[chartData[index].id]);
+            });
+        });
+
+        // Event-Listener für Header-Klicks (Floating-Funktion)
+        document.querySelectorAll('.chart-header').forEach(header => {
+            header.addEventListener('click', (event) => {
+                const container = event.target.closest('.chart-container');
+                const chartId = container.id.split('-')[1];
+
+                // Umschalten der 'popped-out' Klasse
+                container.classList.toggle('popped-out');
+
+                // Nach einem kurzen Moment die Größe des Charts anpassen
+                // (Wartezeit, damit die CSS-Transition abgeschlossen ist)
+                setTimeout(() => {
+                    resizeChart(charts[chartId], container);
+                }, 350);
+            });
+        });
+        
+        // Initiales Setzen der Chart-Größen
+        setTimeout(() => {
+            Object.values(charts).forEach((chart, index) => {
+                resizeChart(chart, containerElements[chartData[index].id]);
+            });
+        }, 100);
+
+
+        // 3. Dummy-Daten-Generator (für eine lauffähige Demo)
+        function generateDummyData(count, symbol) {
+            let baseTime = Math.floor(Date.now() / 1000) - count * 60 * 60;
+            let basePrice = symbol === 'BTCUSDT' ? 60000 : symbol === 'ETHUSDT' ? 3000 : symbol === 'NEARUSDT' ? 7 : 25;
+            let data = [];
+            for (let i = 0; i < count; i++) {
+                baseTime += 60 * 60; // Eine Stunde später
+                let open = basePrice + (Math.random() - 0.5) * 50;
+                let close = open + (Math.random() - 0.5) * 50;
+                let high = Math.max(open, close) + Math.random() * 25;
+                let low = Math.min(open, close) - Math.random() * 25;
+                basePrice = close;
+
+                data.push({
+                    time: baseTime,
+                    open: parseFloat(open.toFixed(2)),
+                    high: parseFloat(high.toFixed(2)),
+                    low: parseFloat(low.toFixed(2)),
+                    close: parseFloat(close.toFixed(2)),
+                });
+            }
+            return data;
+        }
+
+    </script>
+</body>
+</html>
