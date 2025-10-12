@@ -1,98 +1,221 @@
-<script>
-  // Initialisierung der Panels
-  const panels = [
-    { id: 'tv-eth', symbol: 'BINANCE:ETHUSDT' },
-    { id: 'tv-near', symbol: 'BINANCE:NEARUSDT' },
-    { id: 'tv-link', symbol: 'BINANCE:LINKUSDT' },
-    { id: 'tv-btc', symbol: 'BINANCE:BTCUSDT' },
-  ];
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>TradingView 4-Panel Übersicht — ETH / NEAR / LINK / BTC</title>
+  <script src="https://s3.tradingview.com/tv.js"></script>
 
-  // TradingView Widgets laden
-  function createTV(containerId, symbol) {
-    new TradingView.widget({
-      "container_id": containerId,
-      "autosize": true,
-      "symbol": symbol,
-      "interval": "60",
-      "timezone": "Europe/Berlin",
-      "theme": "dark",
-      "style": "1",
-      "locale": "de",
-      "toolbar_bg": "#0b1220",
-      "allow_symbol_change": true,
-      "studies": ["MACD@tv-basicstudies", "RSI@tv-basicstudies"],
-      "details": false,
-      "hotlist": false
-    });
-  }
-
-  panels.forEach(p => createTV(p.id, p.symbol));
-
-  const gridEl = document.getElementById('grid');
-  const panelEls = Array.from(document.querySelectorAll('.panel'));
-
-  // Helper: floating Panel zentralisieren
-  function centerPanel(p) {
-    const w = Math.min(window.innerWidth * 0.9, 1200);
-    const h = Math.min(window.innerHeight * 0.85, 800);
-    p.style.width = w + 'px';
-    p.style.height = h + 'px';
-    p.style.left = (window.innerWidth - w) / 2 + 'px';
-    p.style.top = (window.innerHeight - h) / 2 + 'px';
-    p.style.zIndex = 9999;
-  }
-
-  function resetPanel(p) {
-    p.classList.remove('floating');
-    p.style.position = '';
-    p.style.width = '';
-    p.style.height = '';
-    p.style.left = '';
-    p.style.top = '';
-    p.style.zIndex = '';
-    p.style.transform = '';
-  }
-
-  function updateDimmed() {
-    const anyFloating = document.querySelector('.panel.floating');
-    panelEls.forEach(p => {
-      if (!anyFloating) p.classList.remove('dimmed');
-      else p.classList.toggle('dimmed', !p.classList.contains('floating'));
-    });
-  }
-
-  // Toggle-Logik
-  document.querySelectorAll('.title').forEach(title => {
-    title.addEventListener('click', () => {
-      const id = title.dataset.panel;
-      const panel = document.getElementById(id);
-
-      const floatingNow = panel.classList.contains('floating');
-
-      // Zuerst alle zurücksetzen (damit immer 4 sichtbar bleiben)
-      panelEls.forEach(resetPanel);
-
-      if (!floatingNow) {
-        panel.classList.add('floating');
-        panel.style.position = 'fixed';
-        centerPanel(panel);
-      }
-
-      updateDimmed();
-    });
-  });
-
-  // ESC schließt alle Popups
-  window.addEventListener('keydown', e => {
-    if (e.key === 'Escape') {
-      panelEls.forEach(resetPanel);
-      updateDimmed();
+  <style>
+    :root {
+      --gap: 12px;
+      --title-h: 36px;
+      --bg: #0f1720;
+      --panel-bg: #0b1220;
+      --title-bg: rgba(255,255,255,0.05);
+      --accent: #0ea5a5;
+      --radius: 8px;
+      --shadow: 0 6px 18px rgba(2,6,23,0.6);
+      --text: #e6eef8;
+      --muted: #9fb0c8;
     }
-  });
 
-  // Automatisch zentrieren bei Resize
-  window.addEventListener('resize', () => {
-    const floating = document.querySelector('.panel.floating');
-    if (floating) centerPanel(floating);
-  });
-</script>
+    html,body {
+      height:100%;
+      margin:0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: linear-gradient(180deg,#07121a 0%, #061018 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+    }
+
+    header {
+      padding:16px 20px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      color:var(--muted);
+      font-weight:600;
+      letter-spacing:0.2px;
+    }
+    header h1{margin:0;font-size:16px;color:var(--text);font-weight:700;}
+
+    .grid {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-auto-rows:calc((100vh - 84px - var(--gap)) / 2);
+      gap:var(--gap);
+      padding:12px;
+      box-sizing:border-box;
+      height:calc(100vh - 60px);
+    }
+
+    .panel {
+      background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));
+      border-radius:var(--radius);
+      overflow:hidden;
+      position:relative;
+      display:flex;
+      flex-direction:column;
+      box-shadow:var(--shadow);
+      transition:transform .25s ease,width .25s ease,height .25s ease,left .25s ease,top .25s ease;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+
+    .title {
+      height:var(--title-h);
+      display:flex;
+      align-items:center;
+      padding:0 12px;
+      cursor:pointer;
+      background:linear-gradient(180deg,var(--title-bg),rgba(255,255,255,0.01));
+      gap:10px;
+      font-size:14px;
+      color:var(--text);
+      border-bottom:1px solid rgba(255,255,255,0.02);
+      user-select:none;
+    }
+
+    .dot {width:10px;height:10px;border-radius:50%;background:var(--accent);}
+    .label {font-weight:600;flex:1;}
+
+    .content {flex:1;min-height:0;position:relative;}
+
+    .floating {
+      position:fixed !important;
+      border-radius:12px !important;
+      box-shadow:0 18px 50px rgba(2,6,23,0.8);
+      outline:2px solid rgba(14,165,165,0.06);
+      z-index:9999 !important;
+    }
+
+    .dimmed {filter:brightness(0.8);}
+
+    @media (max-width:900px){
+      .grid{grid-template-columns:1fr;grid-auto-rows:calc((100vh - 84px - var(--gap)) / 4);}
+    }
+
+    footer {
+      padding:8px 16px 20px;
+      color:var(--muted);
+      font-size:13px;
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>4-Panel TradingView Übersicht</h1>
+    <div style="flex:1"></div>
+    <div style="color:var(--muted);font-size:13px">
+      Klicke auf die Titel-Leiste, um ein Panel zu vergrößern / wiederherzustellen
+    </div>
+  </header>
+
+  <main class="grid" id="grid">
+    <div class="panel" id="panel-eth">
+      <div class="title" data-panel="panel-eth">
+        <div class="dot"></div><div class="label">Ethereum — ETH/USDT</div>
+      </div>
+      <div class="content" id="tv-eth"></div>
+    </div>
+
+    <div class="panel" id="panel-near">
+      <div class="title" data-panel="panel-near">
+        <div class="dot"></div><div class="label">NEAR — NEAR/USDT</div>
+      </div>
+      <div class="content" id="tv-near"></div>
+    </div>
+
+    <div class="panel" id="panel-link">
+      <div class="title" data-panel="panel-link">
+        <div class="dot"></div><div class="label">Chainlink — LINK/USDT</div>
+      </div>
+      <div class="content" id="tv-link"></div>
+    </div>
+
+    <div class="panel" id="panel-btc">
+      <div class="title" data-panel="panel-btc">
+        <div class="dot"></div><div class="label">Bitcoin — BTC/USDT</div>
+      </div>
+      <div class="content" id="tv-btc"></div>
+    </div>
+  </main>
+
+  <footer>
+    Einfach <code>index.html</code> ins Repository-Root legen → GitHub Pages aktivieren.
+  </footer>
+
+  <script>
+    // TradingView-Widgets
+    const panels = [
+      {id:'tv-eth',symbol:'BINANCE:ETHUSDT'},
+      {id:'tv-near',symbol:'BINANCE:NEARUSDT'},
+      {id:'tv-link',symbol:'BINANCE:LINKUSDT'},
+      {id:'tv-btc',symbol:'BINANCE:BTCUSDT'}
+    ];
+
+    function createTV(id,sym){
+      new TradingView.widget({
+        container_id:id,autosize:true,symbol:sym,interval:"60",timezone:"Europe/Berlin",
+        theme:"dark",style:"1",locale:"de",toolbar_bg:"#0b1220",
+        allow_symbol_change:true,studies:["MACD@tv-basicstudies","RSI@tv-basicstudies"]
+      });
+    }
+    panels.forEach(p=>createTV(p.id,p.symbol));
+
+    const panelEls=[...document.querySelectorAll('.panel')];
+
+    function centerPanel(p){
+      const w=Math.min(window.innerWidth*0.9,1200);
+      const h=Math.min(window.innerHeight*0.85,800);
+      p.style.width=w+'px';
+      p.style.height=h+'px';
+      p.style.left=(window.innerWidth-w)/2+'px';
+      p.style.top=(window.innerHeight-h)/2+'px';
+      p.style.zIndex=9999;
+    }
+
+    function resetPanel(p){
+      p.classList.remove('floating');
+      p.style.position='';p.style.width='';p.style.height='';
+      p.style.left='';p.style.top='';p.style.zIndex='';p.style.transform='';
+    }
+
+    function updateDimmed(){
+      const any=document.querySelector('.panel.floating');
+      panelEls.forEach(p=>{
+        if(!any)p.classList.remove('dimmed');
+        else p.classList.toggle('dimmed',!p.classList.contains('floating'));
+      });
+    }
+
+    document.querySelectorAll('.title').forEach(t=>{
+      t.addEventListener('click',()=>{
+        const id=t.dataset.panel;
+        const panel=document.getElementById(id);
+        const floating=panel.classList.contains('floating');
+        // alle zurücksetzen, damit Grid immer voll bleibt
+        panelEls.forEach(resetPanel);
+        if(!floating){
+          panel.classList.add('floating');
+          panel.style.position='fixed';
+          centerPanel(panel);
+        }
+        updateDimmed();
+      });
+    });
+
+    window.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){panelEls.forEach(resetPanel);updateDimmed();}
+    });
+
+    window.addEventListener('resize',()=>{
+      const f=document.querySelector('.panel.floating');
+      if(f)centerPanel(f);
+    });
+
+    updateDimmed();
+  </script>
+</body>
+</html>
