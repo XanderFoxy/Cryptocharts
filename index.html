@@ -6,65 +6,131 @@
 <title>Meine Bitget Futures Charts</title>
 <script src="https://s3.tradingview.com/tv.js"></script>
 <style>
-  body {margin:0; background:#0f1720; color:white; font-family:sans-serif;}
-  header {padding:16px; font-size:16px; font-weight:700;}
-  .grid {display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:12px;}
-  @media(max-width:900px){.grid{grid-template-columns:1fr;}}
-  .chart-box {position:relative; min-height:300px; background:#0b1220; border-radius:8px; overflow:hidden;}
-  iframe, .widget {width:100%; height:100%; border:0;}
-  .overlay-error {
-    position:absolute; top:0; left:0; right:0; bottom:0;
+  :root {
+    --gap:12px;
+    --title-h:36px;
+    --bg:#0f1720;
+    --panel-bg:#0b1220;
+    --radius:8px;
+    --shadow:0 6px 18px rgba(2,6,23,0.6);
+    --text:#e6eef8;
+    --muted:#9fb0c8;
+    --active:#10b981; /* grün für aktive Titelleiste */
+  }
+
+  body{margin:0; font-family:sans-serif; background:var(--bg); color:var(--text);}
+  header{padding:16px;font-size:16px;font-weight:700;}
+  .grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    grid-auto-rows:calc((100vh - 84px - var(--gap))/2);
+    gap:var(--gap);
+    padding:12px;
+    height:calc(100vh - 60px);
+  }
+  @media(max-width:900px){.grid{grid-template-columns:1fr;grid-auto-rows:300px;}}
+
+  .panel{
+    background:var(--panel-bg);
+    border-radius:var(--radius);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    box-shadow:var(--shadow);
+    transition:transform .25s ease,width .25s ease,height .25s ease,left .25s ease,top .25s ease;
+    border:1px solid rgba(255,255,255,0.03);
+  }
+
+  .title{
+    height:var(--title-h);
+    display:flex;
+    align-items:center;
+    padding:0 12px;
+    cursor:pointer;
+    background:linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.01));
+    gap:10px;
+    font-size:14px;
+    color:var(--text);
+    border-bottom:1px solid rgba(255,255,255,0.02);
+    user-select:none;
+    font-weight:600;
+  }
+  .title.active { background-color: var(--active); color:white; }
+
+  .dot{width:10px;height:10px;border-radius:50%;background:var(--active);}
+  .label{flex:1;}
+
+  .content{flex:1;min-height:0;position:relative;}
+
+  .floating{
+    position:fixed !important;
+    border-radius:12px !important;
+    box-shadow:0 18px 50px rgba(2,6,23,0.8);
+    outline:2px solid rgba(16,185,129,0.2);
+    z-index:9999 !important;
+  }
+
+  .dimmed{filter:brightness(0.8);}
+
+  .overlay-error{
+    position:absolute;top:0;left:0;right:0;bottom:0;
     background:rgba(0,0,0,0.7); color:#f66666;
     display:flex; align-items:center; justify-content:center;
     font-size:16px; padding:20px; text-align:center;
     visibility:hidden;
   }
-  .error-visible {visibility:visible;}
+  .error-visible{visibility:visible;}
 </style>
 </head>
 <body>
-<header>Meine Bitget Futures Charts</header>
-<div class="grid">
-  <div class="chart-box" id="box-eth">
-    <iframe id="iframe-eth"
-      src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:ETHUSDT_PERP">
-    </iframe>
-    <div class="overlay-error" id="err-eth">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
-    <div class="widget" id="widget-eth"></div>
+<header>Meine Bitget Futures Charts (5-Minuten)</header>
+<main class="grid" id="grid">
+  <div class="panel" id="panel-eth">
+    <div class="title" data-panel="panel-eth"><div class="dot"></div><div class="label">Ethereum — ETH/USDT</div></div>
+    <div class="content">
+      <iframe id="iframe-eth" src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:ETHUSDT_PERP"></iframe>
+      <div class="overlay-error" id="err-eth">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-eth"></div>
+    </div>
   </div>
 
-  <div class="chart-box" id="box-near">
-    <iframe id="iframe-near"
-      src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:NEARUSDT.P">
-    </iframe>
-    <div class="overlay-error" id="err-near">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
-    <div class="widget" id="widget-near"></div>
+  <div class="panel" id="panel-near">
+    <div class="title" data-panel="panel-near"><div class="dot"></div><div class="label">Near — NEAR/USDT</div></div>
+    <div class="content">
+      <iframe id="iframe-near" src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:NEARUSDT.P"></iframe>
+      <div class="overlay-error" id="err-near">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-near"></div>
+    </div>
   </div>
 
-  <div class="chart-box" id="box-link">
-    <iframe id="iframe-link"
-      src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:LINKUSDT.P">
-    </iframe>
-    <div class="overlay-error" id="err-link">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
-    <div class="widget" id="widget-link"></div>
+  <div class="panel" id="panel-link">
+    <div class="title" data-panel="panel-link"><div class="dot"></div><div class="label">Chainlink — LINK/USDT</div></div>
+    <div class="content">
+      <iframe id="iframe-link" src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:LINKUSDT.P"></iframe>
+      <div class="overlay-error" id="err-link">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-link"></div>
+    </div>
   </div>
 
-  <div class="chart-box" id="box-btc">
-    <iframe id="iframe-btc"
-      src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:BTCUSDT_PERP">
-    </iframe>
-    <div class="overlay-error" id="err-btc">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
-    <div class="widget" id="widget-btc"></div>
+  <div class="panel" id="panel-btc">
+    <div class="title" data-panel="panel-btc"><div class="dot"></div><div class="label">Bitcoin — BTC/USDT</div></div>
+    <div class="content">
+      <iframe id="iframe-btc" src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:BTCUSDT_PERP"></iframe>
+      <div class="overlay-error" id="err-btc">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-btc"></div>
+    </div>
   </div>
-</div>
+</main>
 
 <script>
+// TradingView Fallback
 function createFallbackWidget(containerId,symbol){
   new TradingView.widget({
     container_id: containerId,
     autosize:true,
     symbol:symbol,
-    interval:"60",
+    interval:"5", // 5-Minuten
     timezone:"Europe/Berlin",
     theme:"dark",
     style:"1",
@@ -75,17 +141,15 @@ function createFallbackWidget(containerId,symbol){
   });
 }
 
+// iFrame + Fallback Handling
 function setupChart(iframeId, errDivId, widgetDivId, fallbackSymbol){
   const iframe=document.getElementById(iframeId);
   const errDiv=document.getElementById(errDivId);
   const widgetDiv=document.getElementById(widgetDivId);
-
   iframe.addEventListener('load',()=>{
     try{
       const doc=iframe.contentWindow.document;
-      if(!doc || doc.title==='' || doc.body.innerHTML.length<10){
-        throw new Error('Empty or blocked');
-      }
+      if(!doc||doc.title===''||doc.body.innerHTML.length<10) throw new Error('Empty or blocked');
       widgetDiv.style.display='none';
     }catch(e){
       iframe.style.display='none';
@@ -93,7 +157,6 @@ function setupChart(iframeId, errDivId, widgetDivId, fallbackSymbol){
       createFallbackWidget(widgetDivId,fallbackSymbol);
     }
   });
-
   iframe.addEventListener('error',()=>{
     iframe.style.display='none';
     errDiv.classList.add('error-visible');
@@ -101,10 +164,69 @@ function setupChart(iframeId, errDivId, widgetDivId, fallbackSymbol){
   });
 }
 
+// Panels schwebend
+const panelEls=[...document.querySelectorAll('.panel')];
+const titleEls=[...document.querySelectorAll('.title')];
+
+function updateDimmed(){
+  const anyFloating=document.querySelector('.panel.floating');
+  panelEls.forEach(p=>{
+    if(!anyFloating)p.classList.remove('dimmed');
+    else p.classList.toggle('dimmed',!p.classList.contains('floating'));
+  });
+  titleEls.forEach(t=>{
+    const id=t.dataset.panel;
+    const panel=document.getElementById(id);
+    if(panel.classList.contains('floating')) t.classList.add('active');
+    else t.classList.remove('active');
+  });
+}
+
+// Toggle Panels
+titleEls.forEach(t=>{
+  t.addEventListener('click',()=>{
+    const id=t.dataset.panel;
+    const panel=document.getElementById(id);
+    const floatingNow=panel.classList.contains('floating');
+    panelEls.forEach(p=>{p.classList.remove('floating');p.style.position='';p.style.width='';p.style.height='';p.style.left='';p.style.top='';p.style.zIndex='';});
+    if(!floatingNow){
+      panel.classList.add('floating');
+      panel.style.position='fixed';
+      const w=Math.min(window.innerWidth*0.9,1200);
+      const h=Math.min(window.innerHeight*0.85,800);
+      panel.style.width=w+'px';
+      panel.style.height=h+'px';
+      panel.style.left=(window.innerWidth-w)/2+'px';
+      panel.style.top=(window.innerHeight-h)/2+'px';
+      panel.style.zIndex=9999;
+    }
+    updateDimmed();
+  });
+});
+
+// ESC schließt alle
+window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){panelEls.forEach(p=>{p.classList.remove('floating');p.style.position='';p.style.width='';p.style.height='';p.style.left='';p.style.top='';p.style.zIndex='';});updateDimmed();}
+});
+
+window.addEventListener('resize',()=>{
+  const f=document.querySelector('.panel.floating');
+  if(f){
+    const w=Math.min(window.innerWidth*0.9,1200);
+    const h=Math.min(window.innerHeight*0.85,800);
+    f.style.width=w+'px';
+    f.style.height=h+'px';
+    f.style.left=(window.innerWidth-w)/2+'px';
+    f.style.top=(window.innerHeight-h)/2+'px';
+  }
+});
+
+// Setup iFrames + Fallbacks
 setupChart('iframe-eth','err-eth','widget-eth','BITGET:ETHUSDT_PERP');
 setupChart('iframe-near','err-near','widget-near','BITGET:NEARUSDT.P');
 setupChart('iframe-link','err-link','widget-link','BITGET:LINKUSDT.P');
 setupChart('iframe-btc','err-btc','widget-btc','BITGET:BTCUSDT_PERP');
+updateDimmed();
 </script>
 </body>
 </html>
