@@ -29,7 +29,6 @@
   }
   @media(max-width:1000px){.grid{grid-template-columns:1fr 1fr;}}
   @media(max-width:700px){.grid{grid-template-columns:1fr;grid-auto-rows:280px;}}
-
   .panel{
     background:var(--panel-bg);
     border-radius:var(--radius);
@@ -111,6 +110,14 @@
     <div class="title" data-panel="panel-btc"><div class="dot"></div><div class="label">Bitcoin — BTC/USDT</div></div>
     <div class="content" id="chart-btc"></div>
   </div>
+  <div class="panel" id="panel-rune">
+    <div class="title" data-panel="panel-rune"><div class="dot"></div><div class="label">Thorchain — RUNE/USDT</div></div>
+    <div class="content" id="chart-rune"></div>
+  </div>
+  <div class="panel" id="panel-sol">
+    <div class="title" data-panel="panel-sol"><div class="dot"></div><div class="label">Solana — SOL/USDT</div></div>
+    <div class="content" id="chart-sol"></div>
+  </div>
 </main>
 
 <script>
@@ -133,13 +140,15 @@ function createChart(container,symbol){
 }
 
 const pairs=[
-  {id:'trump',sym:'BITGET:TRUMPUSDT_PERP'},
-  {id:'melania',sym:'BITGET:MELANIAUSDT_PERP'},
-  {id:'etc',sym:'BITGET:ETCUSDT_PERP'},
-  {id:'near',sym:'BITGET:NEARUSDT_PERP'},
-  {id:'aia',sym:'BITGET:AIAUSDT_PERP'},
-  {id:'pump',sym:'BITGET:PUMPUSDT_PERP'},
-  {id:'btc',sym:'BITGET:BTCUSDT_PERP'}
+  {id:'trump',sym:'BITGET:TRUMPUSDT.P'},
+  {id:'melania',sym:'BITGET:MELANIAUSDT.P'},
+  {id:'etc',sym:'BITGET:ETCUSDT.P'},
+  {id:'near',sym:'BITGET:NEARUSDT.P'},
+  {id:'aia',sym:'BITGET:AIAUSDT.P'},
+  {id:'pump',sym:'BITGET:PUMPUSDT.P'},
+  {id:'btc',sym:'BITGET:BTCUSDT.P'},
+  {id:'rune',sym:'BITGET:RUNEUSDT.P'},
+  {id:'sol',sym:'BITGET:SOLUSDT.P'}
 ];
 pairs.forEach(p=>createChart('chart-'+p.id,p.sym));
 
