@@ -15,11 +15,12 @@
     --shadow:0 6px 18px rgba(2,6,23,0.6);
     --text:#e6eef8;
     --muted:#9fb0c8;
-    --active:#10b981; /* grün für aktive Titelleiste */
+    --active:#10b981;
   }
 
-  body{margin:0; font-family:sans-serif; background:var(--bg); color:var(--text);}
-  header{padding:16px;font-size:16px;font-weight:700;}
+  body{margin:0;font-family:sans-serif;background:var(--bg);color:var(--text);}
+  header{padding:16px;font-size:16px;font-weight:700;display:flex;justify-content:space-between;align-items:center;}
+  .theme-toggle{cursor:pointer;padding:6px 12px;border:1px solid var(--muted);border-radius:6px;font-size:14px;background:transparent;color:var(--text);}
   .grid{
     display:grid;
     grid-template-columns:1fr 1fr;
@@ -60,9 +61,7 @@
 
   .dot{width:10px;height:10px;border-radius:50%;background:var(--active);}
   .label{flex:1;}
-
   .content{flex:1;min-height:0;position:relative;}
-
   .floating{
     position:fixed !important;
     border-radius:12px !important;
@@ -70,9 +69,7 @@
     outline:2px solid rgba(16,185,129,0.2);
     z-index:9999 !important;
   }
-
   .dimmed{filter:brightness(0.8);}
-
   .overlay-error{
     position:absolute;top:0;left:0;right:0;bottom:0;
     background:rgba(0,0,0,0.7); color:#f66666;
@@ -81,42 +78,81 @@
     visibility:hidden;
   }
   .error-visible{visibility:visible;}
+
+  body.light {
+    --bg:#f8fafc;
+    --panel-bg:#ffffff;
+    --text:#0f1720;
+    --muted:#4b5563;
+    --shadow:0 6px 18px rgba(0,0,0,0.1);
+  }
 </style>
 </head>
 <body>
-<header>Meine Bitget Futures Charts (5-Minuten)</header>
+<header>
+  <div>Meine Bitget Futures Charts (5-Minuten)</div>
+  <button class="theme-toggle" id="themeToggle">🌙 Dunkel</button>
+</header>
+
 <main class="grid" id="grid">
-  <div class="panel" id="panel-eth">
-    <div class="title" data-panel="panel-eth"><div class="dot"></div><div class="label">Ethereum — ETH/USDT</div></div>
+  <div class="panel" id="panel-trump">
+    <div class="title" data-panel="panel-trump"><div class="dot"></div><div class="label">TrumpCoin — TRUMP/USDT</div></div>
     <div class="content">
-      <iframe id="iframe-eth" src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:ETHUSDT_PERP"></iframe>
-      <div class="overlay-error" id="err-eth">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
-      <div class="widget" id="widget-eth"></div>
+      <iframe id="iframe-trump" src="https://www.tradingview.com/chart/?symbol=BITGET:TRUMPUSDT_PERP"></iframe>
+      <div class="overlay-error" id="err-trump">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-trump"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-melania">
+    <div class="title" data-panel="panel-melania"><div class="dot"></div><div class="label">MelaniaCoin — MELANIA/USDT</div></div>
+    <div class="content">
+      <iframe id="iframe-melania" src="https://www.tradingview.com/chart/?symbol=BITGET:MELANIAUSDT_PERP"></iframe>
+      <div class="overlay-error" id="err-melania">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-melania"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-etc">
+    <div class="title" data-panel="panel-etc"><div class="dot"></div><div class="label">Ethereum Classic — ETC/USDT</div></div>
+    <div class="content">
+      <iframe id="iframe-etc" src="https://www.tradingview.com/chart/?symbol=BITGET:ETCUSDT_PERP"></iframe>
+      <div class="overlay-error" id="err-etc">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-etc"></div>
     </div>
   </div>
 
   <div class="panel" id="panel-near">
     <div class="title" data-panel="panel-near"><div class="dot"></div><div class="label">Near — NEAR/USDT</div></div>
     <div class="content">
-      <iframe id="iframe-near" src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:NEARUSDT.P"></iframe>
+      <iframe id="iframe-near" src="https://www.tradingview.com/chart/?symbol=BITGET:NEARUSDT_PERP"></iframe>
       <div class="overlay-error" id="err-near">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
       <div class="widget" id="widget-near"></div>
     </div>
   </div>
 
-  <div class="panel" id="panel-link">
-    <div class="title" data-panel="panel-link"><div class="dot"></div><div class="label">Chainlink — LINK/USDT</div></div>
+  <div class="panel" id="panel-aia">
+    <div class="title" data-panel="panel-aia"><div class="dot"></div><div class="label">AIA — AIA/USDT</div></div>
     <div class="content">
-      <iframe id="iframe-link" src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:LINKUSDT.P"></iframe>
-      <div class="overlay-error" id="err-link">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
-      <div class="widget" id="widget-link"></div>
+      <iframe id="iframe-aia" src="https://www.tradingview.com/chart/?symbol=BITGET:AIAUSDT_PERP"></iframe>
+      <div class="overlay-error" id="err-aia">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-aia"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel-pump">
+    <div class="title" data-panel="panel-pump"><div class="dot"></div><div class="label">Pump — PUMP/USDT</div></div>
+    <div class="content">
+      <iframe id="iframe-pump" src="https://www.tradingview.com/chart/?symbol=BITGET:PUMPUSDT_PERP"></iframe>
+      <div class="overlay-error" id="err-pump">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
+      <div class="widget" id="widget-pump"></div>
     </div>
   </div>
 
   <div class="panel" id="panel-btc">
     <div class="title" data-panel="panel-btc"><div class="dot"></div><div class="label">Bitcoin — BTC/USDT</div></div>
     <div class="content">
-      <iframe id="iframe-btc" src="https://www.tradingview.com/chart/9aW8uzX9/?symbol=BITGET:BTCUSDT_PERP"></iframe>
+      <iframe id="iframe-btc" src="https://www.tradingview.com/chart/?symbol=BITGET:BTCUSDT_PERP"></iframe>
       <div class="overlay-error" id="err-btc">iFrame konnte nicht geladen — zeige öffentliches Chart.</div>
       <div class="widget" id="widget-btc"></div>
     </div>
@@ -124,15 +160,14 @@
 </main>
 
 <script>
-// TradingView Fallback
 function createFallbackWidget(containerId,symbol){
   new TradingView.widget({
     container_id: containerId,
     autosize:true,
     symbol:symbol,
-    interval:"5", // 5-Minuten
+    interval:"5",
     timezone:"Europe/Berlin",
-    theme:"dark",
+    theme:document.body.classList.contains('light')?'light':'dark',
     style:"1",
     locale:"de",
     toolbar_bg:"#0b1220",
@@ -141,7 +176,6 @@ function createFallbackWidget(containerId,symbol){
   });
 }
 
-// iFrame + Fallback Handling
 function setupChart(iframeId, errDivId, widgetDivId, fallbackSymbol){
   const iframe=document.getElementById(iframeId);
   const errDiv=document.getElementById(errDivId);
@@ -164,7 +198,6 @@ function setupChart(iframeId, errDivId, widgetDivId, fallbackSymbol){
   });
 }
 
-// Panels schwebend
 const panelEls=[...document.querySelectorAll('.panel')];
 const titleEls=[...document.querySelectorAll('.title')];
 
@@ -182,7 +215,6 @@ function updateDimmed(){
   });
 }
 
-// Toggle Panels
 titleEls.forEach(t=>{
   t.addEventListener('click',()=>{
     const id=t.dataset.panel;
@@ -204,9 +236,11 @@ titleEls.forEach(t=>{
   });
 });
 
-// ESC schließt alle
 window.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){panelEls.forEach(p=>{p.classList.remove('floating');p.style.position='';p.style.width='';p.style.height='';p.style.left='';p.style.top='';p.style.zIndex='';});updateDimmed();}
+  if(e.key==='Escape'){
+    panelEls.forEach(p=>{p.classList.remove('floating');p.style.position='';p.style.width='';p.style.height='';p.style.left='';p.style.top='';p.style.zIndex='';});
+    updateDimmed();
+  }
 });
 
 window.addEventListener('resize',()=>{
@@ -221,12 +255,19 @@ window.addEventListener('resize',()=>{
   }
 });
 
-// Setup iFrames + Fallbacks
-setupChart('iframe-eth','err-eth','widget-eth','BITGET:ETHUSDT_PERP');
-setupChart('iframe-near','err-near','widget-near','BITGET:NEARUSDT.P');
-setupChart('iframe-link','err-link','widget-link','BITGET:LINKUSDT.P');
-setupChart('iframe-btc','err-btc','widget-btc','BITGET:BTCUSDT_PERP');
+const pairs=['trump','melania','etc','near','aia','pump','btc'];
+pairs.forEach(p=>{
+  setupChart('iframe-'+p,'err-'+p,'widget-'+p,'BITGET:'+p.toUpperCase()+'USDT_PERP');
+});
 updateDimmed();
+
+// Theme Toggle
+const btn=document.getElementById('themeToggle');
+btn.addEventListener('click',()=>{
+  document.body.classList.toggle('light');
+  const light=document.body.classList.contains('light');
+  btn.textContent=light?'🌞 Hell':'🌙 Dunkel';
+});
 </script>
 </body>
 </html>
