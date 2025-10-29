@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial‑scale=1">
 <title>Meine Bitget Futures Charts</title>
 <script src="https://s3.tradingview.com/tv.js"></script>
 <style>
@@ -20,6 +20,7 @@
   body{margin:0;font-family:sans-serif;background:var(--bg);color:var(--text);}
   header{padding:12px 16px;font-size:16px;font-weight:700;display:flex;justify-content:space-between;align-items:center;}
   .theme-toggle{cursor:pointer;padding:6px 12px;border:1px solid var(--muted);border-radius:6px;font-size:14px;background:transparent;color:var(--text);}
+  .ticker‑info{padding:8px 16px;background:var(--panel-bg);color:var(--text);font-size:14px;border-bottom:1px solid rgba(255,255,255,0.03);}
   .grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -77,9 +78,13 @@
 </head>
 <body>
 <header>
-  <div>Meine Bitget Futures Charts (1-Minute)</div>
-  <button class="theme-toggle" id="themeToggle">🌙 Dunkel</button>
+  <div>Meine Bitget Futures Charts (1‑Minute)</div>
+  <button class="theme-toggle" id="themeToggle">🌙 Dunkel</button>
 </header>
+
+<section class="ticker‑info" id="liveTicker">
+  Lade Live‑Daten…
+</section>
 
 <main class="grid" id="grid">
   <div class="panel" id="panel-trump">
@@ -95,7 +100,7 @@
     <div class="content" id="chart-etc"></div>
   </div>
   <div class="panel" id="panel-near">
-    <div class="title" data-panel="panel-near"><div class="dot"></div><div class="label">Near — NEAR/USDT</div></div>
+    <div class="title" data-panel="panel-near"><div a class="dot"></div><div class="label">Near — NEAR/USDT</div></div>
     <div class="content" id="chart-near"></div>
   </div>
   <div class="panel" id="panel-aia">
@@ -111,7 +116,7 @@
     <div class="content" id="chart-btc"></div>
   </div>
   <div class="panel" id="panel-rune">
-    <div class="title" data-panel="panel-rune"><div class="dot"></div><div class="label">Thorchain — RUNE/USDT</div></div>
+    <div class="title" data-panel="panel-rune"><div class .="dot"></div><div class="label">Thorchain — RUNE/USDT</div></div>
     <div class="content" id="chart-rune"></div>
   </div>
   <div class="panel" id="panel-sol">
@@ -121,13 +126,34 @@
 </main>
 
 <script>
-// TradingView Mini-Widgets
+// Funktion für Liveticker
+function updateTicker(){
+  fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=price_change_percentage_24h_desc&per_page=1&page=1')
+    .then(res=>res.json())
+    .then(data=>{
+      if(data && data.length>0){
+        const top = data[0];
+        document.getElementById('liveTicker').innerHTML =
+          `🔝 Top Gainer heute: ${top.name} (${top.symbol.toUpperCase()}/USDT) +${top.price_change_percentage_24h.toFixed(2)}%`;
+      } else {
+        document.getElementById('liveTicker').innerHTML = 'Keine Daten verfügbar';
+      }
+    })
+    .catch(err=>{
+      document.getElementById('liveTicker').innerHTML = 'Fehler beim Laden der Daten';
+    });
+}
+// Setzt Intervall auf 5 Minuten
+updateTicker();
+setInterval(updateTicker, 300000);
+
+// Charts
 function createChart(container,symbol){
   new TradingView.widget({
     container_id: container,
     autosize: true,
     symbol: symbol,
-    interval: "1", // 1-Minute
+    interval: "1",
     timezone: "Europe/Berlin",
     theme: document.body.classList.contains('light') ? "light" : "dark",
     style: "1",
@@ -152,7 +178,7 @@ const pairs=[
 ];
 pairs.forEach(p=>createChart('chart-'+p.id,p.sym));
 
-// Floating-Fenster
+// Floating‑Panels
 const panelEls=[...document.querySelectorAll('.panel')];
 const titleEls=[...document.querySelectorAll('.title')];
 
@@ -165,9 +191,11 @@ function updateDimmed(){
   titleEls.forEach(t=>{
     const id=t.dataset.panel;
     const panel=document.getElementById(id);
-    if(panel.classList.contains('floating'))t.classList.add('active');else t.classList.remove('active');
+    if(panel.classList.contains('floating')) t.classList.add('active');
+    else t.classList.remove('active');
   });
 }
+
 titleEls.forEach(t=>{
   t.addEventListener('click',()=>{
     const id=t.dataset.panel;
@@ -188,6 +216,7 @@ titleEls.forEach(t=>{
     updateDimmed();
   });
 });
+
 window.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     panelEls.forEach(p=>{p.classList.remove('floating');p.style='';});
@@ -211,7 +240,7 @@ updateDimmed();
 const btn=document.getElementById('themeToggle');
 btn.addEventListener('click',()=>{
   document.body.classList.toggle('light');
-  btn.textContent=document.body.classList.contains('light')?'🌞 Hell':'🌙 Dunkel';
+  btn.textContent=document.body.classList.contains('light')?'🌞 Hell':'🌙 Dunkel';
   document.querySelectorAll('[id^="chart-"]').forEach(el=>el.innerHTML='');
   pairs.forEach(p=>createChart('chart-'+p.id,p.sym));
 });
