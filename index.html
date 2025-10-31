@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial‑scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Meine Bitget Futures Charts</title>
 <script src="https://s3.tradingview.com/tv.js"></script>
 <style>
@@ -20,7 +20,7 @@
   body{margin:0;font-family:sans-serif;background:var(--bg);color:var(--text);}
   header{padding:12px 16px;font-size:16px;font-weight:700;display:flex;justify-content:space-between;align-items:center;}
   .theme-toggle{cursor:pointer;padding:6px 12px;border:1px solid var(--muted);border-radius:6px;font-size:14px;background:transparent;color:var(--text);}
-  .ticker‑info{padding:8px 16px;background:var(--panel-bg);color:var(--text);font-size:14px;border-bottom:1px solid rgba(255,255,255,0.03);}
+  .ticker-info{padding:8px 16px;background:var(--panel-bg);color:var(--text);font-size:14px;border-bottom:1px solid rgba(255,255,255,0.03);}
   .grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
@@ -78,12 +78,12 @@
 </head>
 <body>
 <header>
-  <div>Meine Bitget Futures Charts (1‑Minute)</div>
-  <button class="theme-toggle" id="themeToggle">🌙 Dunkel</button>
+  <div>Meine Bitget Futures Charts (1-Minute)</div>
+  <button class="theme-toggle" id="themeToggle">🌙 Dunkel</button>
 </header>
 
-<section class="ticker‑info" id="liveTicker">
-  Lade Live‑Daten…
+<section class="ticker-info" id="liveTicker">
+  Lade Live-Daten…
 </section>
 
 <main class="grid" id="grid">
@@ -123,6 +123,44 @@
     <div class="title" data-panel="panel-sol"><div class="dot"></div><div class="label">Solana — SOL/USDT</div></div>
     <div class="content" id="chart-sol"></div>
   </div>
+
+  <!-- Neue hinzugefügte Paare -->
+  <div class="panel" id="panel-aero">
+    <div class="title" data-panel="panel-aero"><div class="dot"></div><div class="label">Aero — AERO/USDT</div></div>
+    <div class="content" id="chart-aero"></div>
+  </div>
+  <div class="panel" id="panel-rdnt">
+    <div class="title" data-panel="panel-rdnt"><div class="dot"></div><div class="label">Radiant — RDNT/USDT</div></div>
+    <div class="content" id="chart-rdnt"></div>
+  </div>
+  <div class="panel" id="panel-bnb">
+    <div class="title" data-panel="panel-bnb"><div class="dot"></div><div class="label">BNB — BNB/USDT</div></div>
+    <div class="content" id="chart-bnb"></div>
+  </div>
+  <div class="panel" id="panel-bgb">
+    <div class="title" data-panel="panel-bgb"><div class="dot"></div><div class="label">Bitget Token — BGB/USDT</div></div>
+    <div class="content" id="chart-bgb"></div>
+  </div>
+  <div class="panel" id="panel-form">
+    <div class="title" data-panel="panel-form"><div class="dot"></div><div class="label">Form — FORM/USDT</div></div>
+    <div class="content" id="chart-form"></div>
+  </div>
+  <div class="panel" id="panel-elon">
+    <div class="title" data-panel="panel-elon"><div class="dot"></div><div class="label">Elon — 10000ELON/USDT</div></div>
+    <div class="content" id="chart-elon"></div>
+  </div>
+  <div class="panel" id="panel-doge">
+    <div class="title" data-panel="panel-doge"><div class="dot"></div><div class="label">Dogecoin — DOGE/USDT</div></div>
+    <div class="content" id="chart-doge"></div>
+  </div>
+  <div class="panel" id="panel-spell">
+    <div class="title" data-panel="panel-spell"><div class="dot"></div><div class="label">Spell — SPELL/USDT</div></div>
+    <div class="content" id="chart-spell"></div>
+  </div>
+  <div class="panel" id="panel-cro">
+    <div class="title" data-panel="panel-cro"><div class="dot"></div><div class="label">Cronos — CRO/USDT</div></div>
+    <div class="content" id="chart-cro"></div>
+  </div>
 </main>
 
 <script>
@@ -134,7 +172,7 @@ function updateTicker(){
       if(data && data.length>0){
         const top = data[0];
         document.getElementById('liveTicker').innerHTML =
-          `🔝 Top Gainer heute: ${top.name} (${top.symbol.toUpperCase()}/USDT) +${top.price_change_percentage_24h.toFixed(2)}%`;
+          `🔝 Top Gainer heute: ${top.name} (${top.symbol.toUpperCase()}/USDT) +${top.price_change_percentage_24h.toFixed(2)}%`;
       } else {
         document.getElementById('liveTicker').innerHTML = 'Keine Daten verfügbar';
       }
@@ -143,7 +181,6 @@ function updateTicker(){
       document.getElementById('liveTicker').innerHTML = 'Fehler beim Laden der Daten';
     });
 }
-// Setzt Intervall auf 5 Minuten
 updateTicker();
 setInterval(updateTicker, 300000);
 
@@ -174,11 +211,20 @@ const pairs=[
   {id:'pump',sym:'BITGET:PUMPUSDT.P'},
   {id:'btc',sym:'BITGET:BTCUSDT.P'},
   {id:'rune',sym:'BITGET:RUNEUSDT.P'},
-  {id:'sol',sym:'BITGET:SOLUSDT.P'}
+  {id:'sol',sym:'BITGET:SOLUSDT.P'},
+  {id:'aero',sym:'BITGET:AEROUSDT.P'},
+  {id:'rdnt',sym:'BITGET:RDNTUSDT.P'},
+  {id:'bnb',sym:'BITGET:BNBUSDT.P'},
+  {id:'bgb',sym:'BITGET:BGBUSDT.P'},
+  {id:'form',sym:'BITGET:FORMUSDT.P'},
+  {id:'elon',sym:'BITGET:10000ELONUSDT.P'},
+  {id:'doge',sym:'BITGET:DOGEUSDT.P'},
+  {id:'spell',sym:'BITGET:SPELLUSDT.P'},
+  {id:'cro',sym:'BITGET:CROUSDT.P'}
 ];
 pairs.forEach(p=>createChart('chart-'+p.id,p.sym));
 
-// Floating‑Panels
+// Rest bleibt identisch (Floating-Panels, Theme Switch etc.)
 const panelEls=[...document.querySelectorAll('.panel')];
 const titleEls=[...document.querySelectorAll('.title')];
 
@@ -236,11 +282,10 @@ window.addEventListener('resize',()=>{
 });
 updateDimmed();
 
-// Theme Switch
 const btn=document.getElementById('themeToggle');
 btn.addEventListener('click',()=>{
   document.body.classList.toggle('light');
-  btn.textContent=document.body.classList.contains('light')?'🌞 Hell':'🌙 Dunkel';
+  btn.textContent=document.body.classList.contains('light')?'🌞 Hell':'🌙 Dunkel';
   document.querySelectorAll('[id^="chart-"]').forEach(el=>el.innerHTML='');
   pairs.forEach(p=>createChart('chart-'+p.id,p.sym));
 });
